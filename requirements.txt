@@ -1,3 +1,4 @@
-solara==1.22
+# solara==1.22
+solara @ https://github.com/widgetti/solara/archive/refs/heads/master.zip
 openai==0.27.4
 ipyleaflet==0.17.2
