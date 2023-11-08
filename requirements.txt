@@ -1,0 +1,3 @@
+solara==1.22
+openai==0.27.4
+ipyleaflet==0.17.2
