@@ -6,7 +6,7 @@ import openai
 
 import solara
 
-center_default = (53.2305799, 6.5323552)
+center_default = (0, 0)
 zoom_default = 2
 
 messages_default = []
@@ -30,7 +30,10 @@ function_descriptions = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "longitude": {"type": "number", "description": "Longitude of the location to center the map on"},
+                    "longitude": {
+                        "type": "number",
+                        "description": "Longitude of the location to center the map on",
+                    },
                     "latitude": {
                         "type": "number",
                         "description": "Latitude of the location to center the map on",
@@ -52,7 +55,10 @@ function_descriptions = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "longitude": {"type": "number", "description": "Longitude of the location to the marker"},
+                    "longitude": {
+                        "type": "number",
+                        "description": "Longitude of the location to the marker",
+                    },
                     "latitude": {
                         "type": "number",
                         "description": "Latitude of the location to the marker",
@@ -112,7 +118,10 @@ def Map():
         scroll_wheel_zoom=True,
         layers=[
             ipyleaflet.TileLayer.element(url=url),
-            *[ipyleaflet.Marker.element(location=k["location"], draggable=False) for k in markers.value],
+            *[
+                ipyleaflet.Marker.element(location=k["location"], draggable=False)
+                for k in markers.value
+            ],
         ],
     )
 
@@ -165,26 +174,41 @@ def ChatInterface():
 
     solara.use_effect(handle_initial, [])
     result = solara.use_thread(ask, dependencies=[messages.value])
-    with solara.Column(style={"height": "100%"}):
-        with solara.Column(style={"height": "100%", "overflow-y": "auto"}, classes=["chat-interface"]):
-            for message in messages.value:
-                if message["role"] == "user":
-                    solara.Text(message["content"], classes=["chat-message", "user-message"])
-                elif message["role"] == "assistant":
-                    if message["content"]:
-                        solara.Markdown(message["content"])
-                    elif message["tool_calls"]:
-                        solara.Markdown("*Calling map functions*")
+    with solara.Column(
+        style={"height": "100%", "width": "38vw", "justify-content": "center"},
+        classes=["chat-interface"],
+    ):
+        if len(messages.value) > 0:
+            with solara.Column(style={"flex-grow": "1", "overflow-y": "auto"}):
+                for message in messages.value:
+                    if message["role"] == "user":
+                        solara.Text(
+                            message["content"], classes=["chat-message", "user-message"]
+                        )
+                    elif message["role"] == "assistant":
+                        if message["content"]:
+                            solara.Markdown(message["content"])
+                        elif message["tool_calls"]:
+                            solara.Markdown("*Calling map functions*")
+                        else:
+                            solara.Preformatted(
+                                repr(message),
+                                classes=["chat-message", "assistant-message"],
+                            )
+                    elif message["role"] == "tool":
+                        pass  # no need to display
                     else:
-                        solara.Preformatted(repr(message), classes=["chat-message", "assistant-message"])
-                elif message["role"] == "tool":
-                    pass  # no need to display
-                else:
-                    solara.Preformatted(repr(message), classes=["chat-message", "assistant-message"])
-                # solara.Text(message, classes=["chat-message"])
+                        solara.Preformatted(
+                            repr(message), classes=["chat-message", "assistant-message"]
+                        )
+                    # solara.Text(message, classes=["chat-message"])
         with solara.Column():
             solara.InputText(
-                label="Ask your ", value=prompt, style={"flex-grow": "1"}, on_value=add_message, disabled=result.state == solara.ResultState.RUNNING
+                label="Ask your ",
+                value=prompt,
+                style={"flex-grow": "1"},
+                on_value=add_message,
+                disabled=result.state == solara.ResultState.RUNNING,
             )
             solara.ProgressLinear(result.state == solara.ResultState.RUNNING)
             if result.state == solara.ResultState.ERROR:
@@ -210,14 +234,28 @@ def Page():
             messages.set(json.load(f))
         reset_ui()
 
-    with solara.Column(style={"height": "100%"}):
+    with solara.Column(style={"flex-grow": "1"}, gap=0):
         with solara.AppBar():
             solara.Button("Save", on_click=save)
             solara.Button("Load", on_click=load)
             solara.Button("Soft reset", on_click=reset_ui)
-        with solara.Columns(style={"height": "100%"}):
+        with solara.Row(style={"height": "100%"}, justify="space-between"):
             ChatInterface().key(f"chat-{reset_counter}")
-            Map()  # .key(f"map-{reset_counter}")
+            with solara.Column(style={"width": "58vw", "justify-content": "center"}):
+                Map()  # .key(f"map-{reset_counter}")
+
+        solara.Style(
+            """
+            .jupyter-widgets.leaflet-widgets{
+                height: 100%;
+            }
+            .solara-autorouter-content{
+                display: flex;
+                flex-direction: column;
+                justify-content: stretch;
+            }
+            """
+        )
 
 
 # TODO: custom layout
