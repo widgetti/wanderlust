@@ -160,18 +160,18 @@ def ChatInterface():
                 run = openai.beta.threads.runs.retrieve(
                     run_id.value, thread_id=thread.id
                 )  # When run is complete
-                print("run", run.status)
             except NotFoundError:
-                print("run not found (Yet)")
                 continue
             if run.status == "requires_action":
+                tool_outputs = []
                 for tool_call in run.required_action.submit_tool_outputs.tool_calls:
                     tool_output = ai_call(tool_call)
-                    openai.beta.threads.runs.submit_tool_outputs(
-                        thread_id=thread.id,
-                        run_id=run_id.value,
-                        tool_outputs=[tool_output],
-                    )
+                    tool_outputs.append(tool_output)
+                openai.beta.threads.runs.submit_tool_outputs(
+                    thread_id=thread.id,
+                    run_id=run_id.value,
+                    tool_outputs=tool_outputs,
+                )
             if run.status == "completed":
                 messages.set(
                     [
@@ -263,7 +263,6 @@ def ChatInterface():
                                 repr(message),
                                 classes=["chat-message", "assistant-message"],
                             )
-                        # solara.Text(message, classes=["chat-message"])
         with solara.Column():
             solara.InputText(
                 label="Ask your question here",
@@ -275,8 +274,6 @@ def ChatInterface():
             solara.ProgressLinear(result.state == solara.ResultState.RUNNING)
             if result.state == solara.ResultState.ERROR:
                 solara.Error(repr(result.error))
-            # solara.Text("Thinking...")
-            # solara.Button("Send", on_click=lambda: messages.set(messages.value + [message_input.value]))
 
 
 @solara.component
@@ -339,11 +336,3 @@ def Page():
             }
             """
         )
-
-
-# TODO: custom layout
-# @solara.component
-# def Layout(children):
-#     with solara.v.AppBar():
-#         with solara.Column(children=children):
-#             pass
