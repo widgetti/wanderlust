@@ -204,12 +204,6 @@ def ChatInterface():
     solara.use_effect(handle_initial, [])
     # result = solara.use_thread(ask, dependencies=[messages.value])
     with solara.Column(
-        style={
-            "height": "100%",
-            "width": "38vw",
-            "justify-content": "center",
-            "background": "linear-gradient(0deg, transparent 75%, white 100%);",
-        },
         classes=["chat-interface"],
     ):
         if len(messages.value) > 0:
@@ -294,11 +288,7 @@ def Page():
         reset_ui()
 
     with solara.Column(
-        style={
-            "height": "95vh",
-            "justify-content": "center",
-            "padding": "45px 50px 75px 50px",
-        },
+        classes=["ui-container"],
         gap="5vh",
     ):
         with solara.Row(justify="space-between"):
@@ -313,9 +303,11 @@ def Page():
             #     solara.Button("Save", on_click=save)
             #     solara.Button("Load", on_click=load)
             #     solara.Button("Soft reset", on_click=reset_ui)
-        with solara.Row(justify="space-between", style={"flex-grow": "1"}):
+        with solara.Row(
+            justify="space-between", style={"flex-grow": "1"}, classes=["container-row"]
+        ):
             ChatInterface().key(f"chat-{reset_counter}")
-            with solara.Column(style={"width": "50vw", "justify-content": "center"}):
+            with solara.Column(classes=["map-container"]):
                 Map()  # .key(f"map-{reset_counter}")
 
         solara.Style(
@@ -333,6 +325,39 @@ def Page():
                 display: flex;
                 align-items: center;
                 column-gap: 0.5rem;
+            }
+            .ui-container{
+                height: 95vh;
+                justify-content: center;
+                padding: 45px 50px 75px 50px;
+            }
+            .chat-interface{
+                height: 100%;
+                width: 38vw;
+                justify-content: center;
+                background: linear-gradient(0deg, transparent 75%, white 100%);
+            }
+            .map-container{
+                width: 50vw;
+                height: 100%;
+                justify-content: center;
+            }
+            @media screen and (max-aspect-ratio: 1/1) {
+                .ui-container{
+                    padding: 30px;
+                    height: 100vh;
+                }
+                .container-row{
+                    flex-direction: column-reverse !important;
+                    width: 100% !important;
+                }
+                .chat-interface{
+                    width: unset;
+                    justify-content: flex-end;
+                }
+                .map-container{
+                    width: unset;
+                }
             }
             """
         )
