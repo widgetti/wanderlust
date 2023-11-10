@@ -1,12 +1,11 @@
 import json
 import os
+import time
 from pathlib import Path
 
 import ipyleaflet
-from openai import OpenAI, NotFoundError
+from openai import NotFoundError, OpenAI
 from openai.types.beta import Thread
-
-import time
 
 import solara
 
@@ -129,26 +128,31 @@ def Map():
 
 @solara.component
 def ChatMessage(message):
-    # Catch "messages" that are actually tool calls
-    if isinstance(message, dict):
-        icon = "mdi-map" if message["output"] == "Map updated" else "mdi-map-marker"
-        solara.v.Icon(children=[icon], style_="padding-top: 10px;")
-        solara.Markdown(message["output"])
-    elif message.role == "user":
-        solara.Text(message.content[0].text.value, style={"font-weight": "bold;"})
-    elif message.role == "assistant":
-        if message.content[0].text.value:
-            solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
-            solara.Markdown(message.content[0].text.value)
-        elif message.content.tool_calls:
-            solara.v.Icon(children=["mdi-map"], style_="padding-top: 10px;")
-            solara.Markdown("*Calling map functions*")
+    with solara.Row(style={"align-items": "flex-start"}):
+        # Catch "messages" that are actually tool calls
+        if isinstance(message, dict):
+            icon = "mdi-map" if message["output"] == "Map updated" else "mdi-map-marker"
+            solara.v.Icon(children=[icon], style_="padding-top: 10px;")
+            solara.Markdown(message["output"])
+        elif message.role == "user":
+            solara.Text(message.content[0].text.value, style={"font-weight": "bold;"})
+        elif message.role == "assistant":
+            if message.content[0].text.value:
+                solara.v.Icon(
+                    children=["mdi-compass-outline"], style_="padding-top: 10px;"
+                )
+                solara.Markdown(message.content[0].text.value)
+            elif message.content.tool_calls:
+                solara.v.Icon(children=["mdi-map"], style_="padding-top: 10px;")
+                solara.Markdown("*Calling map functions*")
+            else:
+                solara.v.Icon(
+                    children=["mdi-compass-outline"], style_="padding-top: 10px;"
+                )
+                solara.Preformatted(repr(message))
         else:
             solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
             solara.Preformatted(repr(message))
-    else:
-        solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
-        solara.Preformatted(repr(message))
 
 
 @solara.component
@@ -156,23 +160,25 @@ def ChatBox(children=[]):
     # this uses a flexbox with column-reverse to reverse the order of the messages
     # if we now also reverse the order of the messages, we get the correct order
     # but the scroll position is at the bottom of the container automatically
-    solara.Style(
-        """
-        .chat-box > :last-child{
-            padding-top: 7.5vh;
-        }
-        """
-    )
-    solara.Column(
-        style={
-            "flex-grow": "1",
-            "overflow-y": "auto",
-            "height": "100px",
-            "flex-direction": "column-reverse",
-        },
-        classes=["chat-box"],
-        children=reversed(children),
-    )
+    with solara.Column(style={"flex-grow": "1"}):
+        solara.Style(
+            """
+            .chat-box > :last-child{
+                padding-top: 7.5vh;
+            }
+            """
+        )
+        # The height works effectively as `min-height`, since flex will grow the container to fill the available space
+        solara.Column(
+            style={
+                "flex-grow": "1",
+                "overflow-y": "auto",
+                "height": "100px",
+                "flex-direction": "column-reverse",
+            },
+            classes=["chat-box"],
+            children=list(reversed(children)),
+        )
 
 
 @solara.component
@@ -237,9 +243,8 @@ def ChatInterface():
         classes=["chat-interface"],
     ):
         if len(messages.value) > 0:
-            # The height works effectively as `min-height`, since flex will grow the container to fill the available space
             with ChatBox():
-                with solara.Row(style={"align-items": "flex-start"}):
+                for message in messages.value:
                     ChatMessage(message)
 
         with solara.Column():
