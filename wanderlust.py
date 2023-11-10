@@ -186,6 +186,7 @@ def ChatInterface():
     prompt = solara.use_reactive("")
     run_id: solara.Reactive[str] = solara.use_reactive(None)
 
+    # Create a thread to hold the conversation only once when this component is created
     thread: Thread = solara.use_memo(openai.beta.threads.create, dependencies=[])
 
     def add_message(value: str):
@@ -196,6 +197,9 @@ def ChatInterface():
             thread_id=thread.id, content=value, role="user"
         )
         messages.set([*messages.value, new_message])
+        # this creates a new run for the thread
+        # also also triggers a rerender (since run_id.value changes)
+        # which will trigger the poll function blow to start in a thread
         run_id.value = openai.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id="asst_RqVKAzaybZ8un7chIwPCIQdH",
@@ -236,12 +240,11 @@ def ChatInterface():
                 completed = True
             time.sleep(0.1)
 
+    # run/restart a thread any time the run_id changes
     result = solara.use_thread(poll, dependencies=[run_id.value])
 
     # Create DOM for chat interface
-    with solara.Column(
-        classes=["chat-interface"],
-    ):
+    with solara.Column(classes=["chat-interface"]):
         if len(messages.value) > 0:
             with ChatBox():
                 for message in messages.value:
