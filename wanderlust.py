@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import ipyleaflet
 from openai import OpenAI, NotFoundError
@@ -8,6 +9,8 @@ from openai.types.beta import Thread
 import time
 
 import solara
+
+HERE = Path(__file__).parent
 
 center_default = (0, 0)
 zoom_default = 2
@@ -20,7 +23,7 @@ markers = solara.reactive([])
 url = ipyleaflet.basemaps.OpenStreetMap.Mapnik.build_url()
 openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 model = "gpt-4-1106-preview"
-app_style = open("style.css", "r").read()
+app_style = (HERE / "style.css").read_text()
 
 
 # Declare tools for openai assistant to use
