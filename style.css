@@ -73,7 +73,8 @@ div:has(> b):has(a){
     .link-container{
         position: absolute;
         bottom: 0;
+        left: 0;
         width: 100%;
-        justify-content: end;
+        padding: 0 30px;
     }
 }
