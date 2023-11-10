@@ -132,7 +132,7 @@ def ChatMessage(message):
     elif message.role == "user":
         solara.Text(
             message.content[0].text.value,
-            classes=["chat-message", "chat-user-message"],
+            style={"font-weight": "bold;"},
         )
     elif message.role == "assistant":
         if message.content[0].text.value:
@@ -154,7 +154,6 @@ def ChatMessage(message):
             )
             solara.Preformatted(
                 repr(message),
-                classes=["chat-message", "assistant-message"],
             )
     else:
         solara.v.Icon(
@@ -163,7 +162,6 @@ def ChatMessage(message):
         )
         solara.Preformatted(
             repr(message),
-            classes=["chat-message", "assistant-message"],
         )
 
 
@@ -176,9 +174,6 @@ def ChatBox(children=[]):
         """
         .chat-box > :last-child{
             padding-top: 7.5vh;
-        }
-        .chat-user-message{
-            font-weight: bold;
         }
         """
     )
