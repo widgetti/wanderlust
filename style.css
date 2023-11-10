@@ -46,6 +46,10 @@
     justify-content: center;
 }
 
+div:has(> b):has(a){
+    display: none !important;
+}
+
 @media screen and (max-aspect-ratio: 1/1) {
     .ui-container {
         padding: 30px;
@@ -64,5 +68,12 @@
 
     .map-container {
         width: unset;
+    }
+
+    .link-container{
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        justify-content: end;
     }
 }

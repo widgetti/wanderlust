@@ -274,6 +274,54 @@ def Page():
                     unsafe_innerHTML="Wanderlust",
                     style={"display": "inline-block"},
                 )
+            with solara.Row(
+                gap="30px",
+                style={"align-items": "center"},
+                classes=["link-container"],
+                justify="end",
+            ):
+                with solara.Row(gap="5px", style={"align-items": "center"}):
+                    solara.Text("Source Code:", style="font-weight: bold;")
+                    # target="_blank" links are still easiest to do via ipyvuetify
+                    with solara.v.Btn(
+                        icon=True,
+                        tag="a",
+                        attributes={
+                            "href": "https://github.com/widgetti/wanderlust",
+                            "title": "Wanderlust Source Code",
+                            "target": "_blank",
+                        },
+                    ):
+                        solara.v.Icon(children=["mdi-github-circle"])
+                with solara.Row(gap="5px", style={"align-items": "center"}):
+                    solara.Text("Powered by Solara:", style="font-weight: bold;")
+                    with solara.v.Btn(
+                        icon=True,
+                        tag="a",
+                        attributes={
+                            "href": "https://solara.dev/",
+                            "title": "Solara",
+                            "target": "_blank",
+                        },
+                    ):
+                        solara.HTML(
+                            tag="img",
+                            attributes={
+                                "src": "https://solara.dev/static/public/logo.svg",
+                                "width": "24px",
+                            },
+                        )
+                    with solara.v.Btn(
+                        icon=True,
+                        tag="a",
+                        attributes={
+                            "href": "https://github.com/widgetti/solara",
+                            "title": "Solara Source Code",
+                            "target": "_blank",
+                        },
+                    ):
+                        solara.v.Icon(children=["mdi-github-circle"])
+
         with solara.Row(
             justify="space-between", style={"flex-grow": "1"}, classes=["container-row"]
         ):
