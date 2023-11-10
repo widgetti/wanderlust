@@ -252,7 +252,9 @@ def ChatInterface():
 
         with solara.Column():
             solara.InputText(
-                label="Ask your question here",
+                label="Where do you want to go?"
+                if len(messages.value) == 0
+                else "Ask more question here",
                 value=prompt,
                 style={"flex-grow": "1"},
                 on_value=add_message,
