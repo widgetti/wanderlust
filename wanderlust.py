@@ -95,7 +95,8 @@ functions = {
 }
 
 
-def ai_call(tool_call):
+def assistant_tool_call(tool_call):
+    # actually executes the tool call the OpenAI assistant wants to perform
     function = tool_call.function
     name = function.name
     arguments = json.loads(function.arguments)
@@ -207,7 +208,7 @@ def ChatInterface():
             if run.status == "requires_action":
                 tool_outputs = []
                 for tool_call in run.required_action.submit_tool_outputs.tool_calls:
-                    tool_output = ai_call(tool_call)
+                    tool_output = assistant_tool_call(tool_call)
                     tool_outputs.append(tool_output)
                     messages.set([*messages.value, tool_output])
                 openai.beta.threads.runs.submit_tool_outputs(
