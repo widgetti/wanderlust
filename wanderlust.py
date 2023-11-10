@@ -130,39 +130,20 @@ def ChatMessage(message):
         solara.v.Icon(children=[icon], style_="padding-top: 10px;")
         solara.Markdown(message["output"])
     elif message.role == "user":
-        solara.Text(
-            message.content[0].text.value,
-            style={"font-weight": "bold;"},
-        )
+        solara.Text(message.content[0].text.value, style={"font-weight": "bold;"})
     elif message.role == "assistant":
         if message.content[0].text.value:
-            solara.v.Icon(
-                children=["mdi-compass-outline"],
-                style_="padding-top: 10px;",
-            )
+            solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
             solara.Markdown(message.content[0].text.value)
         elif message.content.tool_calls:
-            solara.v.Icon(
-                children=["mdi-map"],
-                style_="padding-top: 10px;",
-            )
+            solara.v.Icon(children=["mdi-map"], style_="padding-top: 10px;")
             solara.Markdown("*Calling map functions*")
         else:
-            solara.v.Icon(
-                children=["mdi-compass-outline"],
-                style_="padding-top: 10px;",
-            )
-            solara.Preformatted(
-                repr(message),
-            )
+            solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
+            solara.Preformatted(repr(message))
     else:
-        solara.v.Icon(
-            children=["mdi-compass-outline"],
-            style_="padding-top: 10px;",
-        )
-        solara.Preformatted(
-            repr(message),
-        )
+        solara.v.Icon(children=["mdi-compass-outline"], style_="padding-top: 10px;")
+        solara.Preformatted(repr(message))
 
 
 @solara.component
