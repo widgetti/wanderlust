@@ -168,6 +168,23 @@ def ChatMessage(message):
 
 
 @solara.component
+def ChatBox(children=[]):
+    # this uses a flexbox with column-reverse to reverse the order of the messages
+    # if we now also reverse the order of the messages, we get the correct order
+    # but the scroll position is at the bottom of the container automatically
+    solara.Column(
+        style={
+            "flex-grow": "1",
+            "overflow-y": "auto",
+            "height": "100px",
+            "flex-direction": "column-reverse",
+        },
+        classes=["chat-box"],
+        children=reversed(children),
+    )
+
+
+@solara.component
 def ChatInterface():
     prompt = solara.use_reactive("")
     run_id: solara.Reactive[str] = solara.use_reactive(None)
@@ -230,18 +247,9 @@ def ChatInterface():
     ):
         if len(messages.value) > 0:
             # The height works effectively as `min-height`, since flex will grow the container to fill the available space
-            with solara.Column(
-                style={
-                    "flex-grow": "1",
-                    "overflow-y": "auto",
-                    "height": "100px",
-                    "flex-direction": "column-reverse",
-                },
-                classes=["chat-box"],
-            ):
-                for message in reversed(messages.value):
-                    with solara.Row(style={"align-items": "flex-start"}):
-                        ChatMessage(message)
+            with ChatBox():
+                with solara.Row(style={"align-items": "flex-start"}):
+                    ChatMessage(message)
 
         with solara.Column():
             solara.InputText(
