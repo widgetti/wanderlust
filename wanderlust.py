@@ -132,7 +132,7 @@ def ChatMessage(message):
     elif message.role == "user":
         solara.Text(
             message.content[0].text.value,
-            classes=["chat-message", "user-message"],
+            classes=["chat-message", "chat-user-message"],
         )
     elif message.role == "assistant":
         if message.content[0].text.value:
@@ -172,6 +172,16 @@ def ChatBox(children=[]):
     # this uses a flexbox with column-reverse to reverse the order of the messages
     # if we now also reverse the order of the messages, we get the correct order
     # but the scroll position is at the bottom of the container automatically
+    solara.Style(
+        """
+        .chat-box > :last-child{
+            padding-top: 7.5vh;
+        }
+        .chat-user-message{
+            font-weight: bold;
+        }
+        """
+    )
     solara.Column(
         style={
             "flex-grow": "1",
@@ -323,16 +333,10 @@ def Page():
                 width: 100%;
                 height: 15%;
             }
-            .chat-box > :last-child{
-                padding-top: 7.5vh;
-            }
             .map-container{
                 width: 50vw;
                 height: 100%;
                 justify-content: center;
-            }
-            .user-message{
-                font-weight: bold;
             }
             @media screen and (max-aspect-ratio: 1/1) {
                 .ui-container{
