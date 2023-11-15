@@ -19,3 +19,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY --chown=user *.py *.css /
 
 ENTRYPOINT ["solara", "run", "wanderlust.py", "--host=0.0.0.0", "--port", "7860"]
+
